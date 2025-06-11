@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Money</title>
+</head>
+<body>
+<h2>Transfer Money</h2>
+
+<form id="transferForm">
+    <label for="fromAccount">From account:</label>
+    <select id="fromAccount" name="fromAccount"></select><br><br>
+
+    <label for="toAccount">To account:</label>
+    <input type="text" id="toAccount" name="toAccount" required><br><br>
+
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" name="amount" required><br><br>
+
+    <button type="submit">Transfer</button>
+</form>
+
+<script>
+    // Загрузка аккаунтов пользователя
+    window.onload = () => {
+        fetch('/get_accounts_by_user_id') // <-- этот эндпоинт возвращает список аккаунтов
+            .then(response => response.json())
+            .then(accounts => {
+                const select = document.getElementById("fromAccount");
+                accounts.forEach(account => {
+                    const option = document.createElement("option");
+                    option.value = account.id; // или account.number
+                    option.text = `${account.account_id} - ${account.balance}$`;
+                    select.appendChild(option);
+                });
+            });
+    };
+
+    // Отправка перевода
+    document.getElementById("transferForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const fromAccount = document.getElementById("fromAccount").value;
+        const toAccount = document.getElementById("toAccount").value;
+        const amount = parseFloat(document.getElementById("amount").value);
+
+        fetch('/transfer', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({fromAccountId: fromAccount, toAccountId: toAccount, amount: amount})
+        }).then(res => {
+            if (res.ok) {
+                alert("Transfer successful");
+                window.location.href = '/';
+            } else {
+                alert("Transfer error");
+            }
+        });
+    });
+</script>
+</body>
+</html>

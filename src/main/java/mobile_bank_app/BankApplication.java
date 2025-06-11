@@ -1,4 +1,4 @@
-package com.example.bank;
+package mobile_bank_app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
