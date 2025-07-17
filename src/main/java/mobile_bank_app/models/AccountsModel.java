@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "accounts")
 public class AccountsModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     @Column(name = "account_id")
     private String accountId;
 
@@ -16,14 +14,6 @@ public class AccountsModel {
     private long userId;
 
     private long balance;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getAccount_id() {
         return accountId;

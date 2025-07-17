@@ -3,60 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <title>Transfer Money</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
+
 <h2>Transfer Money</h2>
 
 <form id="transferForm">
-    <label for="fromAccount">From account:</label>
-    <select id="fromAccount" name="fromAccount"></select><br><br>
+    <label for="fromAccount">From Account</label>
+    <select id="fromAccount" name="fromAccount" required></select>
 
-    <label for="toAccount">To account:</label>
-    <input type="text" id="toAccount" name="toAccount" required><br><br>
+    <label for="toAccount">To Account</label>
+    <input type="text" id="toAccount" name="toAccount" placeholder="Recipient account ID" required>
 
-    <label for="amount">Amount:</label>
-    <input type="number" id="amount" name="amount" required><br><br>
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" name="amount" placeholder="e.g. 100.00" required min="0.01" step="0.01">
 
     <button type="submit">Transfer</button>
 </form>
 
+<div id="status" class="status"></div>
+
 <script>
-    // Загрузка аккаунтов пользователя
     window.onload = () => {
-        fetch('/get_accounts_by_user_id') // <-- этот эндпоинт возвращает список аккаунтов
+        fetch('/get_accounts_by_user_id')
             .then(response => response.json())
             .then(accounts => {
                 const select = document.getElementById("fromAccount");
                 accounts.forEach(account => {
                     const option = document.createElement("option");
-                    option.value = account.id; // или account.number
-                    option.text = `${account.account_id} - ${account.balance}$`;
+                    option.value = account.account_id;
+                    option.text = `${account.account_id} — €${account.balance.toFixed(2)}`;
                     select.appendChild(option);
                 });
             });
     };
 
-    // Отправка перевода
-    document.getElementById("transferForm").addEventListener("submit", function (event) {
+    document.getElementById("transferForm").addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const fromAccount = document.getElementById("fromAccount").value;
-        const toAccount = document.getElementById("toAccount").value;
+        const toAccount = document.getElementById("toAccount").value.trim();
         const amount = parseFloat(document.getElementById("amount").value);
+        const status = document.getElementById("status");
 
-        fetch('/transfer', {
+        if (isNaN(amount) || amount <= 0) {
+            status.textContent = "Please enter a valid amount.";
+            status.className = "status error";
+            return;
+        }
+
+        const response = await fetch('/transfer', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({fromAccountId: fromAccount, toAccountId: toAccount, amount: amount})
-        }).then(res => {
-            if (res.ok) {
-                alert("Transfer successful");
-                window.location.href = '/';
-            } else {
-                alert("Transfer error");
-            }
+            body: JSON.stringify({ fromAccountId: fromAccount, toAccountId: toAccount, amount })
         });
+
+        if (response.ok) {
+            status.textContent = "✅ Transfer successful!";
+            status.className = "status success";
+            setTimeout(() => window.location.href = '/', 1500);
+        } else {
+            const msg = await response.text();
+            status.textContent = msg || "❌ Transfer failed.";
+            status.className = "status error";
+        }
     });
 </script>
+
 </body>
 </html>

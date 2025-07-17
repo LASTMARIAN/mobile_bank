@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Get JWT token from cookies
+
         String token = null;
         if (request.getCookies() != null) {
             token = Arrays.stream(request.getCookies())

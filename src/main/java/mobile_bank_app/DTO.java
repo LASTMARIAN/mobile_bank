@@ -12,15 +12,19 @@ public class DTO {
     }
 
     static public class TransferRequest {
-        private Long fromAccountId;
+        private String fromAccountId;
         private String toAccountId;
-        private long amount;
+        private int amount;
 
-        public Long getFromAccountId() { return fromAccountId; }
-        public void setFromAccountId(Long fromAccountId) { this.fromAccountId = fromAccountId; }
+        public String getFromAccountId() { return fromAccountId; }
+        public void setFromAccountId(String fromAccountId) { this.fromAccountId = fromAccountId; }
         public String getToAccountId() { return toAccountId; }
         public void setToAccountId(String toAccountId) { this.toAccountId = toAccountId; }
-        public long getAmount() { return amount; }
-        public void setAmount(long amount) { this.amount = amount; }
+        public int getAmount() { return amount; }
+        public void setAmount(int amount) { this.amount = amount; }
     }
 }
+
+
+
+

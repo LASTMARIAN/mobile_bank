@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transactions History</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        thead {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .positive {
+            color: green;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: red;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            table {
+                font-size: 14px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>Transactions History</h1>
+
+<table id="data-table" style="display: none;">
+    <thead>
+    <tr id="table-header"></tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const apiEndpoint = '/get_transactions_by_user_id';
+
+        fetch(apiEndpoint)
+            .then(response => response.json())
+            .then(data => {
+                displayDataAsTable(data);
+            });
+    });
+
+    function displayDataAsTable(records) {
+        if (!records || records.length === 0) {
+            alert("No transactions found.");
+            return;
+        }
+
+        const table = document.getElementById('data-table');
+        const headerRow = document.getElementById('table-header');
+        const tableBody = document.getElementById('table-body');
+
+        headerRow.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        const excludedKeys = ['userId'];
+
+        // Человеческие заголовки
+        const columnTitles = {
+            id: "Transaction ID",
+            from_accountId: "Sender Account",
+            to_accountId: "Recipient Account",
+            amount: "Amount (€)",
+            date: "Date",
+            updated_at: "Updated",
+            deleted_at: "Deleted"
+        };
+
+        const firstRecord = records[0];
+        for (const key in firstRecord) {
+            if (excludedKeys.includes(key)) continue;
+
+            const th = document.createElement('th');
+            th.textContent = columnTitles[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+            headerRow.appendChild(th);
+        }
+
+        records.forEach(record => {
+            const row = document.createElement('tr');
+
+            for (const key in record) {
+                if (excludedKeys.includes(key)) continue;
+
+                const td = document.createElement('td');
+                const value = record[key];
+
+                if (key === 'amount' && typeof value === 'number') {
+                    td.className = value < 0 ? 'negative' : 'positive';
+                    const formatted = (value < 0 ? '' : '+') + value.toFixed(2) + ' €';
+                    td.textContent = formatted;
+                } else if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+                    const date = new Date(value);
+                    td.textContent = date.toLocaleString();
+                } else {
+                    td.textContent = value;
+                }
+
+                row.appendChild(td);
+            }
+
+            tableBody.appendChild(row);
+        });
+
+        table.style.display = 'table';
+    }
+</script>
+</body>
+</html>
