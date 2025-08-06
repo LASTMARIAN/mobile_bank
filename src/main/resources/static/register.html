@@ -102,11 +102,26 @@
 </div>
 
 <script>
+    function validatePassword(password) {
+        const minLength = 12;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSymbol = /[^a-zA-Z0-9]/.test(password); // спецсимвол
+
+        return password.length >= minLength && hasUppercase && hasLowercase && hasDigit && hasSymbol;
+    }
+
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
+
+        if (!validatePassword(password)) {
+            alert("Password must:\n- Be at least 12 characters long\n- Include at least one uppercase letter\n- Include at least one digit\n- Include at least one symbol (!@#$%^&*-_., etc)\n- Include both letters and digits");
+            return;
+        }
 
         const response = await fetch('https://localhost:8443/register', {
             method: 'POST',

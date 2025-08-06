@@ -1,6 +1,6 @@
 package mobile_bank_app.controllers;
 
-import mobile_bank_app.DTO.AuthRequest;
+import mobile_bank_app.DTOs.AuthRequest;
 import mobile_bank_app.jwt.JwtUtil;
 import mobile_bank_app.repositories.UserRepository;
 import mobile_bank_app.models.UserModel;

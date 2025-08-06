@@ -16,7 +16,43 @@
 
     h1 {
       color: #333;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .account-list {
+      width: 100%;
+      max-width: 600px;
+      background-color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 20px;
       margin-bottom: 40px;
+    }
+
+    .account-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .account-item:last-child {
+      border-bottom: none;
+    }
+
+    .account-id {
+      color: #555;
+      font-weight: 500;
+    }
+
+    .balance {
+      font-weight: bold;
+      color: green;
     }
 
     .button-container {
@@ -63,12 +99,53 @@
 <body>
 
 <h1>Welcome to your Mobile Bank!</h1>
+<h2>Your accounts:</h2>
+<div class="account-list" id="account-list">
+  <p>Loading accounts...</p>
+</div>
 
 <div class="button-container">
   <a href="/transfer.html"><button>💸 Transfer Money</button></a>
   <a href="/transaction_history.html"><button>📊 Transaction History</button></a>
   <a href="/manage_accounts.html"><button>👤 Manage Accounts</button></a>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('/get_accounts_by_user_id')
+            .then(response => response.json())
+            .then(accounts => {
+              const container = document.getElementById('account-list');
+              container.innerHTML = '';
+
+              if (!accounts || accounts.length === 0) {
+                container.innerHTML = '<p>No accounts found.</p>';
+                return;
+              }
+
+              accounts.forEach(acc => {
+                const div = document.createElement('div');
+                div.className = 'account-item';
+
+                const idSpan = document.createElement('span');
+                idSpan.className = 'account-id';
+                idSpan.textContent = '' + acc.account_id;
+
+                const balanceSpan = document.createElement('span');
+                balanceSpan.className = 'balance';
+                balanceSpan.textContent = acc.balance.toFixed(2) + ' €';
+
+                div.appendChild(idSpan);
+                div.appendChild(balanceSpan);
+                container.appendChild(div);
+              });
+            })
+            .catch(err => {
+              document.getElementById('account-list').innerHTML = '<p>Error loading accounts.</p>';
+              console.error(err);
+            });
+  });
+</script>
 
 </body>
 </html>

@@ -2,6 +2,7 @@ package mobile_bank_app.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -24,7 +25,7 @@ public class TransactionsModel {
     @Column(name="from_account_id")
     private String from_accountId;
 
-    private Integer amount;
+    private BigDecimal amount;
 
     public Long getId() {
         return id;
@@ -73,11 +74,11 @@ public class TransactionsModel {
         this.from_accountId = from_accountId;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 }

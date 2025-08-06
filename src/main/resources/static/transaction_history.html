@@ -7,8 +7,12 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
         }
 
         h1 {
@@ -53,6 +57,35 @@
             font-weight: bold;
         }
 
+        .internal-amount {
+            color: #b8860b; /* dark goldenrod */
+            font-weight: bold;
+            text-shadow: 0 0 2px #fff;
+        }
+
+        .incoming-row {
+            background-color: #97E58A !important;
+        }
+
+        .outcoming-row {
+            background-color: #E99999 !important;
+        }
+
+        .internal-row {
+            background-color: #E0D280 !important;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
         @media (max-width: 600px) {
             table {
                 font-size: 14px;
@@ -70,6 +103,7 @@
     </thead>
     <tbody id="table-body"></tbody>
 </table>
+<a href="/index.html"><button>Back to main page</button></a>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -97,7 +131,6 @@
 
         const excludedKeys = ['userId'];
 
-        // Человеческие заголовки
         const columnTitles = {
             id: "Transaction ID",
             from_accountId: "Sender Account",
@@ -105,7 +138,8 @@
             amount: "Amount (€)",
             date: "Date",
             updated_at: "Updated",
-            deleted_at: "Deleted"
+            deleted_at: "Deleted",
+            type: "Type"
         };
 
         const firstRecord = records[0];
@@ -120,6 +154,15 @@
         records.forEach(record => {
             const row = document.createElement('tr');
 
+            // Apply row background class based on transaction type
+            if (record.type === 'incoming') {
+                row.classList.add('incoming-row');
+            } else if (record.type === 'outcoming') {
+                row.classList.add('outcoming-row');
+            } else if (record.type === 'internal') {
+                row.classList.add('internal-row');
+            }
+
             for (const key in record) {
                 if (excludedKeys.includes(key)) continue;
 
@@ -127,9 +170,14 @@
                 const value = record[key];
 
                 if (key === 'amount' && typeof value === 'number') {
-                    td.className = value < 0 ? 'negative' : 'positive';
-                    const formatted = (value < 0 ? '' : '+') + value.toFixed(2) + ' €';
-                    td.textContent = formatted;
+                    if (record.type === 'internal') {
+                        td.className = 'internal-amount';
+                        td.textContent = value.toFixed(2) + ' €';
+                    } else {
+                        td.className = value < 0 ? 'negative' : 'positive';
+                        const formatted = (value < 0 ? '' : '+') + value.toFixed(2) + ' €';
+                        td.textContent = formatted;
+                    }
                 } else if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
                     const date = new Date(value);
                     td.textContent = date.toLocaleString();

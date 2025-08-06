@@ -2,6 +2,8 @@ package mobile_bank_app.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "accounts")
 public class AccountsModel {
@@ -13,7 +15,7 @@ public class AccountsModel {
     @Column(name = "user_id")
     private long userId;
 
-    private long balance;
+    private BigDecimal balance;
 
     public String getAccount_id() {
         return accountId;
@@ -31,7 +33,7 @@ public class AccountsModel {
         this.userId = user_id;
     }
 
-    public long getBalance() { return balance; }
+    public BigDecimal getBalance() { return balance; }
 
-    public void setBalance(long balance) { this.balance = balance; }
+    public void setBalance(BigDecimal balance) { this.balance = balance; }
 }

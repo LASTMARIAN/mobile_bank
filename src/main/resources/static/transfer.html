@@ -58,6 +58,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+            margin-top: 20px;
         }
 
         button:hover {
@@ -88,7 +90,7 @@
     <select id="fromAccount" name="fromAccount" required></select>
 
     <label for="toAccount">To Account</label>
-    <input type="text" id="toAccount" name="toAccount" placeholder="Recipient account ID" required>
+    <input type="text" id="toAccount" name="toAccount" placeholder="ACC_***" required>
 
     <label for="amount">Amount</label>
     <input type="number" id="amount" name="amount" placeholder="e.g. 100.00" required min="0.01" step="0.01">
@@ -96,6 +98,7 @@
     <button type="submit">Transfer</button>
 </form>
 
+<a href="/index.html"><button>Back to main page</button></a>
 <div id="status" class="status"></div>
 
 <script>
@@ -107,7 +110,7 @@
                 accounts.forEach(account => {
                     const option = document.createElement("option");
                     option.value = account.account_id;
-                    option.text = `${account.account_id} — €${account.balance.toFixed(2)}`;
+                    option.text = `${account.account_id}  —  €${account.balance.toFixed(2)}`;
                     select.appendChild(option);
                 });
             });
@@ -121,12 +124,22 @@
         const amount = parseFloat(document.getElementById("amount").value);
         const status = document.getElementById("status");
 
+        // Проверка суммы
         if (isNaN(amount) || amount <= 0) {
             status.textContent = "Please enter a valid amount.";
             status.className = "status error";
             return;
         }
 
+        // Проверка формата toAccount (ACC_ только цифры)
+        const toAccountPattern = /^ACC_\d+$/;
+        if (!toAccountPattern.test(toAccount)) {
+            status.textContent = "Recipient account must be in format ACC_ followed by digits only.";
+            status.className = "status error";
+            return;
+        }
+
+        // Отправка данных на бэкенд
         const response = await fetch('/transfer', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
